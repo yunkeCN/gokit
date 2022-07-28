@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/pkg/errors"
 	"go.elastic.co/apm/module/apmhttp"
 	"golang.org/x/net/context/ctxhttp"
 )
@@ -31,7 +31,7 @@ func PutJson(ctx context.Context, url string, body interface{}, header map[strin
 func PostForm(ctx context.Context, url string, data url.Values, header map[string]string) (respBody []byte, status int, err error) {
 	request, err := http.NewRequest("POST", url, strings.NewReader(data.Encode()))
 	if err != nil {
-		return nil, 0, errors.Wrapf(err, "new request error. url=%s, data=%+v", url, data)
+		return nil, 0, fmt.Errorf("new request error. url=%s, data=%+v, error=%+v", url, data, err)
 	}
 
 	for key, value := range header {
@@ -41,17 +41,17 @@ func PostForm(ctx context.Context, url string, data url.Values, header map[strin
 
 	resp, err := ctxhttp.Do(ctx, tracingClient, request)
 	if err != nil {
-		return nil, 0, errors.Wrapf(err, "do request error. url=%s, data=%+v", url, data)
+		return nil, 0, fmt.Errorf("do request error. url=%s, data=%+v, error=%+v", url, data, err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, 0, errors.Wrapf(err, "read resp body error. url=%s, data=%+v", url, data)
+		return nil, 0, fmt.Errorf("read resp body error. url=%s, data=%+v, error=%+v", url, data, err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return respBody, resp.StatusCode, errors.Errorf("do return error. code=%d, url=%s, body=%s", resp.StatusCode, url, respBody)
+		return respBody, resp.StatusCode, fmt.Errorf("do return error. code=%d, url=%s, body=%s", resp.StatusCode, url, respBody)
 	}
 
 	return respBody, resp.StatusCode, nil
@@ -66,7 +66,7 @@ func DoJson(ctx context.Context, method string, url string, body interface{}, he
 	if body != nil {
 		bodyBytes, err = json.Marshal(body)
 		if err != nil {
-			return respBody, status, errors.Wrapf(err, "json marshal body error. method=%s, url=%s, body=%v", method, url, body)
+			return respBody, status, fmt.Errorf("json marshal body error. method=%s, url=%s, body=%v, error=%+v", method, url, body, err)
 		}
 	}
 
@@ -82,18 +82,18 @@ func DoJson(ctx context.Context, method string, url string, body interface{}, he
 	request.Header.Set("Content-Type", "application/json")
 	resp, err := ctxhttp.Do(ctx, tracingClient, request)
 	if err != nil {
-		err = errors.Wrapf(err, "do request error. method=%s, url=%s", method, url)
+		err = fmt.Errorf("do request error. method=%s, url=%s, error=%+v", method, url, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	respBody, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, 0, errors.Wrapf(err, "read resp body error. method=%s, url=%s", method, url)
+		return nil, 0, fmt.Errorf("read resp body error. method=%s, url=%s, error=%+v", method, url, err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return respBody, resp.StatusCode, errors.Errorf("do return error. code:%d, method=%s, url=%s, resp=%s", resp.StatusCode, method, url, respBody)
+		return respBody, resp.StatusCode, fmt.Errorf("do return error. code:%d, method=%s, url=%s, resp=%s", resp.StatusCode, method, url, respBody)
 	}
 
 	return respBody, resp.StatusCode, nil

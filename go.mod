@@ -3,7 +3,6 @@ module github.com/yunkeCN/gokit
 go 1.17
 
 require (
-	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.6.1
 	go.elastic.co/apm/module/apmhttp v1.15.0
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129
@@ -18,8 +17,9 @@ require (
 	github.com/elastic/go-windows v1.0.0 // indirect
 	github.com/jcchavezs/porto v0.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/jinzhu/now v1.1.2 // indirect
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/procfs v0.0.0-20190425082905-87a4384529e0 // indirect
 	github.com/santhosh-tekuri/jsonschema v1.2.4 // indirect
